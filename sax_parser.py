@@ -65,7 +65,8 @@ class Track:
 parser = xml.sax.make_parser() 
 handler = ITunesHandler() 
 parser.setContentHandler(handler) 
-parser.parse('/Users/cwood/Music/iTunes/test.xml') 
+#parser.parse('/Users/cwood/Music/iTunes/test.xml') 
+parser.parse('iTunes\ Music\ Library.xml')
 
 for track in handler.tracks: 
     try:
