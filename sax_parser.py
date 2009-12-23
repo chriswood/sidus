@@ -1,6 +1,12 @@
 import sys 
 import xml.sax.handler
 
+#Need to implement option parser
+if len(sys.argv) > 1:
+    user = sys.argv[1]
+else:
+    print("Need user argument") 
+    sys.exit()   
 #ContentHandler is the main built in class
 #you are supposed to subclass for sax applications
 class ITunesHandler(xml.sax.handler.ContentHandler):
@@ -10,7 +16,12 @@ class ITunesHandler(xml.sax.handler.ContentHandler):
         self.value = '' 
         self.tracks = [] 
         self.track = None 
-        
+        #probably a better way to prevent handling unwanted things...
+        self.first_key = 'Track ID'
+        self.last_key = 'Album'
+        #This is where you put what you want to store
+        self.wanted_info = ['Artist', 'Name', self.last_key]
+
     def skippedEntity(self, name):
         #This gets called whenever an element is not parsed. 
         #If we have to skip a song for some reason, this would
@@ -27,46 +38,51 @@ class ITunesHandler(xml.sax.handler.ContentHandler):
         if name == 'key': 
             self.parse = True 
             
-    def endElement(self,name): 
+    def endElement(self,name):
         if name == 'key': 
             self.parse = False 
         else: 
-            if self.tag == 'Track ID': 
-                # start of a new track, so a new object
-                # is needed. 
+            info_type = getattr(self, 'tag')
+            if info_type == self.first_key: 
+                # start of a new track, so a new object is needed. 
                 self.track = Track() 
-            elif self.tag == 'Name' and self.track: 
-                self.track.track = self.value 
-            elif self.tag == 'Artist' and self.track: 
-                self.track.artist = self.value 
-                #This code assumes Artist is the last thing we want,
-                #I need to change this 
+            elif self.track and info_type in self.wanted_info: 
+                #if we have a legit track, and we want this info stored
+                setattr(self.track, info_type, self.value)
+                
+            if info_type == self.last_key:
                 self.tracks.append(self.track) 
                 self.track = None 
-                
+                         
     def characters(self, content): 
-        #This takes chunks of data from your document and 
+        #This takes chunks of data from your document, various amounts at a time
         if self.parse: 
             self.tag = content
             self.value = '' 
         else: 
-            # could be multiple lines, so append data.
             self.value = self.value + content
                 
 class Track: 
     def __init__(self): 
-        self.track = '' 
-        self.artist = '' 
+        self.Name = '' 
+        self.Artist = '' 
+        self.Album = ''
         
     def __str__(self): 
-        return "Track = %s\nArtist = %s" % (self.track,self.artist) 
+        return "---------------------------------\
+                \nTrack: %s\nArtist: %s\nAlbum: %s"\
+                 % (self.Name, self.Artist, self.Album) 
         
         
 parser = xml.sax.make_parser() 
 handler = ITunesHandler() 
 parser.setContentHandler(handler) 
-#parser.parse('/Users/cwood/Music/iTunes/test.xml') 
-parser.parse('iTunes\ Music\ Library.xml')
+file_location = "/Users/%s/Music/iTunes/test.xml" % user
+try:
+    parser.parse(file_location) 
+except:
+    print("Could not open %s" % file_location)
+#parser.parse('iTunes\ Music\ Library.xml')
 
 for track in handler.tracks: 
     try:
