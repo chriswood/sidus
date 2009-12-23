@@ -7,6 +7,7 @@ if len(sys.argv) > 1:
 else:
     print("Need user argument") 
     sys.exit()   
+    
 #ContentHandler is the main built in class
 #you are supposed to subclass for sax applications
 class ITunesHandler(xml.sax.handler.ContentHandler):
