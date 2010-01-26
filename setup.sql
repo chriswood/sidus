@@ -6,4 +6,9 @@ CREATE TABLE songs (
     creation_date DATE DEFAULT (datetime('now','localtime'))
 ) 
 
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name varchar(60) UNIQUE NOT NULL
+)
+
 #Ran using sqlite 3.4.0
