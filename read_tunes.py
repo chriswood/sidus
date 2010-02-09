@@ -24,7 +24,7 @@ db_path = get_db_path()
 parser = xml.sax.make_parser() 
 handler = ITunesHandler() 
 parser.setContentHandler(handler) 
-file_location = "/Users/%s/Music/iTunes/test.xml" % user
+file_location = "/Users/%s/Music/iTunes/iTunes Music Library.xml" % user
 
 try:
     parser.parse(file_location) 
@@ -32,21 +32,21 @@ except:
     print("Could not open %s" % file_location)
 
 tunes_db = db_wrapper(db_path)
-songs = tunes_db.get_songs()
-
-for song in songs:
-    print(song)
-
-if not user_exists(user):
-    tunes_db.add_user(user)
-else:
-    print("There is already a user with that name. ")
+# songs = tunes_db.get_songs()
+# 
+# for song in songs:
+#     print(song)
+# 
+# if not user_exists(user):
+#     tunes_db.add_user(user)
+# else:
+#     print("There is already a user with that name. ")
     
-# for track in handler.tracks: 
-#     try:    
-#         print track
-#     except:
-#         pass
+for track in handler.tracks: 
+    try:    
+        print track
+    except:
+        pass
         
         
         

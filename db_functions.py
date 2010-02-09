@@ -25,6 +25,20 @@ class db_wrapper:
     #this one will take the user's xml info and update the central db
     def update_data():
         pass
+        
+    def process_song(self, username, title, artist):
+        #First check to see if this user has previously added this song
+        if user_has_song(username, title, artist):
+            return True
+
+        #now check to see if it exists in the main song table
+        if not check_dup(title, artist)
+            song_id = 
+
+        #add this song's id to this user's songlist
+        update_user_song_count(user, )
+
+        return
     
     #things ran initially by the first setup script
     #---------------------------------------------------#
@@ -35,9 +49,6 @@ class db_wrapper:
         self.cursor.execute(sql, params)
         self.conn_obj.commit()
         
-    def send_data():
-        pass
-        
     #things used only by utilities and such. 
     #--------------------------------------------------#
     
@@ -47,6 +58,14 @@ class db_wrapper:
         self.cursor.execute(sql, params)
         return self.cursor.fetchone()
         
+    def check_dup(self, title, artist):
+        return False
+        
+    def user_has_song(user, title, artist):
+        return False
+        
+    def add_song(title, artist, album):
+        return True
     
         
         
