@@ -4,10 +4,12 @@ import sqlite3
     Class to handle basic functions with the sqlite db
     
     TODO: error handling
+    
+    Right now all of these functions pertain to the main db, which will be on
+    a central server
 """
 class db_wrapper:
     def __init__(self, db_path):
-        #no damn auto-commit here, and I don't put cream in my coffee neither
         self.conn_obj = sqlite3.connect(db_path)
         self.cursor = self.conn_obj.cursor()
         
@@ -32,8 +34,8 @@ class db_wrapper:
             return True
 
         #now check to see if it exists in the main song table
-        if not check_dup(title, artist)
-            song_id = 
+        # if not check_dup(title, artist)
+        #          song_id = 
 
         #add this song's id to this user's songlist
         update_user_song_count(user, )
@@ -47,6 +49,17 @@ class db_wrapper:
         params = (username,)
         sql = """insert into users (name) values (?)"""
         self.cursor.execute(sql, params)
+        self.conn_obj.commit()
+        
+    def create_songs_table(self):
+        sql = """CREATE TABLE songs(
+            id INTEGER PRIMARY KEY NOT NULL,
+            title TEXT UNIQUE NOT NULL,
+            artist TEXT,
+            album TEXT,
+            creation_date DATE DEFAULT (datetime('now','localtime'))
+        )"""
+        self.cursor.execute(sql)
         self.conn_obj.commit()
         
     #things used only by utilities and such. 
@@ -66,6 +79,7 @@ class db_wrapper:
         
     def add_song(title, artist, album):
         return True
+    
     
         
         
