@@ -18,7 +18,7 @@ def get_db_path(db):
         takes a string db name for a parameter and returns the corresonding
         connection, either 'central' or 'local'
     '''
-    return(settings.get('db_settings', '_'.join((db,'db_path'))))
+    return(settings.get('db_settings', '_'.join((db, 'db_path'))))
     
 def set_up_dir(user):
     '''

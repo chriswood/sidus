@@ -43,32 +43,23 @@ it will be destroyed. Keep going? (y/n)''' % (user))
         
         #create local db
         set_up_local_db(user)
-        
+
     else:
         raise_error('abort', '\nSidus user creation has been cancelled.\n')
 
-    # Create db
-    # update db with xml info
-    # add user to main database
-    # update main database with user's song info
-    # songs = tunes_db.get_songs()    
-else:
-    print('exists')
-sys.exit(0)
-for song in songs:
-    print(song)
-    
-try:
-    parser.parse(file_location) 
-except:
-    raise_error('file handling', "Could not open %s" % file_location)
+        
+#do a full parse of the itunes xml
+parser.parse(file_location) 
 
+#now we have a list of Track class objects in handler.tracks,
+#so we can update the local db
+local_path = get_db_path('local')
+local_db = db_wrapper(local_path)
+
+for track in handler.tracks:
+    #handle song...
+    local_db.process_song_local(user, track)
     
-# for track in handler.tracks: 
-#     try:    
-#         print track
-#     except:
-#         pass
-#         
-        
-        
+    #then update the central db
+    #I guess there will be a button or something for "update main db"
+              

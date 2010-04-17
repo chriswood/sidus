@@ -28,18 +28,14 @@ class db_wrapper:
     def update_data():
         pass
         
-    def process_song(self, username, title, artist):
+    def process_song_local(self, username, track):
         #First check to see if this user has previously added this song
-        if user_has_song(username, title, artist):
-            return True
 
-        #now check to see if it exists in the main song table
-        # if not check_dup(title, artist)
-        #          song_id = 
-
-        #add this song's id to this user's songlist
-        update_user_song_count(user, )
-
+        if self._user_has_song(track.Name, track.Artist):
+            return
+        
+        #add to users local db
+        self._add_song(track)
         return
     
     #things ran initially by the first setup script
@@ -54,7 +50,7 @@ class db_wrapper:
     def create_songs_table(self):
         sql = """CREATE TABLE songs(
             id INTEGER PRIMARY KEY NOT NULL,
-            title TEXT UNIQUE NOT NULL,
+            title TEXT NOT NULL,
             artist TEXT,
             album TEXT,
             creation_date DATE DEFAULT (datetime('now','localtime'))
@@ -67,17 +63,35 @@ class db_wrapper:
     
     def get_user(self, username):
         params = (username,)
-        sql = """select * from users where name = ?"""   
+        sql = """SELECT * FROM users WHERE name = ?"""   
         self.cursor.execute(sql, params)
         return self.cursor.fetchone()
         
     def check_dup(self, title, artist):
         return False
         
-    def user_has_song(user, title, artist):
-        return False
+    def _user_has_song(self, title, artist):
+        '''
+            If the song name and singer are the same,
+            consider it a dupe
+        '''
+        params = (title.lower(), artist.lower(), )
+        sql = """SELECT 1 FROM songs 
+                 WHERE LOWER(title) = ?
+                 AND LOWER(artist) = ?"""
         
-    def add_song(title, artist, album):
+        self.cursor.execute(sql, params)
+        return(self.cursor.fetchone())
+        
+    def _add_song(self, track):
+        print(track.Name)
+        import datetime
+        params = (track.Name, track.Artist, track.Album)
+        sql = """INSERT INTO songs (title, artist, album, creation_date)
+                 VALUES (?, ?, ?, datetime('NOW'))"""
+                 
+        self.cursor.execute(sql, params)
+        self.conn_obj.commit()
         return True
     
     
