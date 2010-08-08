@@ -1,12 +1,12 @@
+import sys
 import sqlite3
+import datetime
 
 """
     Class to handle basic functions with the sqlite db
     
     TODO: error handling
     
-    Right now all of these functions pertain to the main db, which will be on
-    a central server
 """
 class db_wrapper:
     def __init__(self, db_path):
@@ -16,27 +16,27 @@ class db_wrapper:
     #things ran regularly
     #---------------------------------------------------#
     
-    #probably need to do some paging. I'm not sure but I don't think
-    #I can avoid the total result load, like in sqlalchemy when you
-    #avoid the .all() and just get what you need
     def get_songs(self):
         sql = 'select * from songs'
         self.cursor.execute(sql)
         return self.cursor.fetchall()
         
-    #this one will take the user's xml info and update the central db
-    def update_data():
-        pass
-        
     def process_song_local(self, username, track):
-        #First check to see if this user has previously added this song
+        '''Adds song to local db'''
+        if not self._song_exists(track.Name, track.Artist):
+            self._add_song(track)
 
-        if self._user_has_song(track.Name, track.Artist):
-            return
+    def process_song_central(self, username, track):
+        '''
+            If this song does not exist at all in central, add it. Then
+            handle the user song record
+        '''       
+        song_id = self._song_exists(track.Name, track.Artist)
+        if not song_id:
+            song_id = self._add_song(track)
+        if not self._user_song_exists(song_id, username):
+            self._add_user_song(song_id, username)   
         
-        #add to users local db
-        self._add_song(track)
-        return
     
     #things ran initially by the first setup script
     #---------------------------------------------------#
@@ -58,6 +58,9 @@ class db_wrapper:
         self.cursor.execute(sql)
         self.conn_obj.commit()
         
+    def get_total_changes(self):
+        return self.conn_obj.total_changes
+        
     #things used only by utilities and such. 
     #--------------------------------------------------#
     
@@ -67,32 +70,44 @@ class db_wrapper:
         self.cursor.execute(sql, params)
         return self.cursor.fetchone()
         
-    def check_dup(self, title, artist):
-        return False
-        
-    def _user_has_song(self, title, artist):
+    def _song_exists(self, title, artist):
         '''
-            If the song name and singer are the same,
-            consider it a dupe
+            If the song name and singer are the same, consider it a dupe. This
+            returns None or the id of the song
         '''
         params = (title.lower(), artist.lower(), )
-        sql = """SELECT 1 FROM songs 
+        sql = """SELECT id FROM songs 
                  WHERE LOWER(title) = ?
                  AND LOWER(artist) = ?"""
+        
+        self.cursor.execute(sql, params)
+        song_id = self.cursor.fetchone()
+        return(song_id if song_id == None else song_id[0])
+    
+    def _user_song_exists(self, song_id, user_id):
+        params = (song_id, user_id, )
+        sql = """SELECT 1 FROM user_songs 
+                 WHERE song_id = ?
+                 AND user_id = ?"""
         
         self.cursor.execute(sql, params)
         return(self.cursor.fetchone())
         
     def _add_song(self, track):
-        print(track.Name)
-        import datetime
+        print("adding %s" % track.Name)
         params = (track.Name, track.Artist, track.Album)
         sql = """INSERT INTO songs (title, artist, album, creation_date)
                  VALUES (?, ?, ?, datetime('NOW'))"""
                  
         self.cursor.execute(sql, params)
         self.conn_obj.commit()
-        return True
+        return(self.cursor.lastrowid)
+    
+    def _add_user_song(self, song_id, user_id):
+        params = (song_id, user_id)
+        sql = """INSERT INTO user_songs (song_id, user_id) VALUES (?, ?)"""           
+        self.cursor.execute(sql, params)
+        self.conn_obj.commit()
     
     
         

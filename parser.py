@@ -31,7 +31,7 @@ class ITunesHandler(xml.sax.handler.ContentHandler):
         if name == 'key': 
             self.parse = True 
             
-    def endElement(self,name):
+    def endElement(self, name):
         if name == 'key': 
             self.parse = False 
         else: 
