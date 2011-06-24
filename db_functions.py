@@ -1,6 +1,7 @@
 import sys
 import sqlite3
 import datetime
+import sys
 
 """
     Class to handle basic functions with the sqlite db
@@ -24,7 +25,7 @@ class db_wrapper:
     def process_song_local(self, username, track):
         '''Adds song to local db'''
         if not self._song_exists(track.Name, track.Artist):
-            self._add_song(track)
+            self._add_song(track, 'local')
 
     def process_song_central(self, username, track):
         '''
@@ -33,7 +34,7 @@ class db_wrapper:
         '''       
         song_id = self._song_exists(track.Name, track.Artist)
         if not song_id:
-            song_id = self._add_song(track)
+            song_id = self._add_song(track, 'central')
         if not self._user_song_exists(song_id, username):
             self._add_user_song(song_id, username)   
         
@@ -93,8 +94,8 @@ class db_wrapper:
         self.cursor.execute(sql, params)
         return(self.cursor.fetchone())
         
-    def _add_song(self, track):
-        print("adding %s" % track.Name)
+    def _add_song(self, track, db):
+        print("adding song *** %s *** from *** %s *** to %s db" % (track.Name, track.Artist, db))
         params = (track.Name, track.Artist, track.Album)
         sql = """INSERT INTO songs (title, artist, album, creation_date)
                  VALUES (?, ?, ?, datetime('NOW'))"""

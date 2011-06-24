@@ -24,18 +24,19 @@ def set_up_dir(user):
     '''
         cleans out the directory if it exists, and creates it if not
     '''
-    local_db_path = settings.get('db_settings', 'local_db_dir')
-    if os.path.isdir(local_db_path):
-        files = os.listdir(local_db_path)
+    local_db_dir = settings.get('db_settings', 'local_db_dir')
+    if os.path.isdir(local_db_dir):
+        print('safe')
+        files = os.listdir(local_db_dir)
         for file in files:
             if file == '.' or file == '..': 
                 continue
-            path = local_db_path + os.sep + file
+            path = local_db_dir + os.sep + file
             print("removing file %s ..." %(path))
             os.unlink(path)
     else:
-        print("Creating directory %s ..." %(local_db_path))
-        os.mkdir(local_db_path)
+        print("Creating directory %s ..." %(local_db_dir))
+        os.mkdir(local_db_dir)
     
 def raise_error(err_type, message):
     '''

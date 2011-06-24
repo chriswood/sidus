@@ -35,13 +35,14 @@ file_location = "/Users/%s/%s" % (user, path)
 #file_location = "/Users/%s/%s" % ('cwood', path) TEST
 db_path = get_db_path('central')   
 central_db = db_wrapper(db_path)
+local_db_dir = settings.get('db_settings', 'local_db_dir')
 
 #Is this a new user in the central db? Wipe out any existing local db if so
 if not user_exists(user):
     #--------------------First Time User--------------------
     confirm = raw_input('''****************************************************
-The directory /Users/%s/sidus/ is about to be created, if it already exists
-it will be destroyed. Keep going? (y/n)''' % (user))
+The directory %s is about to be created, if it already exists
+it will be destroyed. Keep going? (y/n)''' % (local_db_dir))
 
     if confirm[0].lower() == 'y':
         central_db.add_user(user)
@@ -55,7 +56,7 @@ parser.parse(file_location)
 
 #now we have a list of Track class objects in handler.tracks,
 #so we can update the local db
-#testing campfire
+
 local_db = db_wrapper(get_db_path('local'))
 central_db = db_wrapper(get_db_path('central'))
 
@@ -69,5 +70,6 @@ for track in handler.tracks:
         central_db.process_song_central(user, track)
 
 if update_main:
-    print("There were %s rows updated in the central database." % central_db.get_total_changes())
+    print("There were %s rows updated in the central database. \
+         \n This is not the number fo songs added." % central_db.get_total_changes())
 

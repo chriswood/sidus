@@ -2,6 +2,7 @@ import xml.sax.handler
 
 #ContentHandler is the main built in class
 #to subclass for sax applications
+#booted element tree
 class ITunesHandler(xml.sax.handler.ContentHandler):
     def __init__(self):
         self.parse = False
@@ -48,7 +49,6 @@ class ITunesHandler(xml.sax.handler.ContentHandler):
                 self.track = None 
                          
     def characters(self, content): 
-        #This takes chunks of data from your document, various amounts at a time
         if self.parse: 
             self.tag = content
             self.value = '' 
